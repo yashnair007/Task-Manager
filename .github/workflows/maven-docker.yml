@@ -1,0 +1,39 @@
+name: CI-CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn clean package
+
+      - name: Run Tests
+        run: mvn test
+
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build Docker Image
+        run: docker build -t yashnair007/task-manager:latest .
+
+      - name: Push Docker Image
+        run: docker push yashnair007/task-manager:latest
