@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: task-container
+    ports:
+      - "9090:9090"
+    depends_on:
+      - mongodb
+    networks:
+      - task-network
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - task-network
+    volumes:
+      - mongo-data:/data/db
+
+networks:
+  task-network:
+
+volumes:
+  mongo-data:
