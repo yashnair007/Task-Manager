@@ -33,7 +33,7 @@ jobs:
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build Docker Image
-        run: docker build -t yashnair007/task-manager:latest .
+        run: docker build -t yashput/taskchecker:latest .
 
       - name: Push Docker Image
-        run: docker push yashnair007/task-manager:latest
+        run: docker push yashput/taskchecker:latest
