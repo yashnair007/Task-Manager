@@ -37,3 +37,14 @@ Java 22
 Apache maven
 Mongo DB
 POSTMAN API 
+
+
+TASK 4 - CI/CD Pipeline
+
+The Pipeline is built using GIT Action
+
+The Docker image of the App has been put as an Image in Docker
+
+The yashput/taskchecker Repo in DOCKER HUB will give the Public Repo for the application
+
+All the process and commands are put as screen shorts in the task4 screen shorts folder
