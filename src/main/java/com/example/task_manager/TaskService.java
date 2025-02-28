@@ -4,82 +4,109 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Date;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.ArrayList;
 
 @Service
 public class TaskService {
-
     @Autowired
     private TaskRepository taskRepository;
 
+    // ✅ Get all tasks
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
     }
 
+    // ✅ Get task by ID
     public Optional<Task> getTaskById(String id) {
         return taskRepository.findById(id);
     }
 
+    // ✅ Find tasks by name
     public List<Task> findTasksByName(String name) {
         return taskRepository.findByNameContaining(name);
     }
 
+    // ✅ Create a task
     public Task saveTask(Task task) {
-        if (task.getTaskExecutions() == null) {
-            task.setTaskExecutions(new ArrayList<>()); // Ensure it's not null
-        }
         return taskRepository.save(task);
     }
 
-    public void deleteTask(String id) {
-        taskRepository.deleteById(id);
-    }
-
+    // ✅ Execute a task (Runs shell command and stores execution output)
     public Task executeTask(String id) {
-        Optional<Task> taskOptional = taskRepository.findById(id);
-        if (taskOptional.isPresent()) {
-            Task task = taskOptional.get();
-    
-            if (task.getCommand() == null || task.getCommand().trim().isEmpty()) {
-                throw new RuntimeException("Command is missing for task: " + id);
-            }
-    
+        Optional<Task> optionalTask = taskRepository.findById(id);
+        if (optionalTask.isPresent()) {
+            Task task = optionalTask.get();
+            String executionOutput = "";
+
             try {
-                Date startTime = new Date(); // Start time
-                ProcessBuilder processBuilder = new ProcessBuilder(task.getCommand().split(" "));
-                processBuilder.redirectErrorStream(true);
-                Process process = processBuilder.start();
-    
-                // Capture the output
-                StringBuilder output = new StringBuilder();
+                // ✅ Detect OS and use appropriate shell
+                ProcessBuilder builder;
+                if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                    builder = new ProcessBuilder("cmd.exe", "/c", task.getCommand());
+                } else {
+                    builder = new ProcessBuilder("/bin/sh", "-c", task.getCommand());
+                }
+
+                builder.redirectErrorStream(true);
+                Process process = builder.start();
+
+                // ✅ Capture command output
                 BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                StringBuilder output = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
                     output.append(line).append("\n");
                 }
-    
+                executionOutput = output.toString().trim();
+
                 process.waitFor();
-                Date endTime = new Date(); // End time
-    
-                // Create execution record
-                TaskExecution taskExecution = new TaskExecution(startTime, endTime, output.toString().trim());
-    
-                // Ensure taskExecutions list is initialized
-                if (task.getTaskExecutions() == null) {
-                    task.setTaskExecutions(new ArrayList<>());
-                }
-                task.getTaskExecutions().add(taskExecution);
-    
-                return taskRepository.save(task);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (IOException | InterruptedException e) {
+                executionOutput = "Error executing command: " + e.getMessage();
             }
+
+            // ✅ Create TaskExecution entry
+            TaskExecution execution = new TaskExecution(
+                LocalDateTime.now(),
+                LocalDateTime.now().plusSeconds(1),
+                executionOutput
+            );
+
+            // ✅ Add execution record and save
+            task.addExecution(execution);
+            return taskRepository.save(task);
+        } else {
+            throw new RuntimeException("Task not found!");
         }
-        return null;
-    }
-    
     }
 
+    // ✅ Update task (Only updates name, owner, and command)
+    public Task updateTask(String id, Task updatedTask) {
+        Optional<Task> optionalTask = taskRepository.findById(id);
+        if (optionalTask.isPresent()) {
+            Task task = optionalTask.get();
+
+            // ✅ Update only allowed fields
+            if (updatedTask.getName() != null) {
+                task.setName(updatedTask.getName());
+            }
+            if (updatedTask.getOwner() != null) {
+                task.setOwner(updatedTask.getOwner());
+            }
+            if (updatedTask.getCommand() != null) {
+                task.setCommand(updatedTask.getCommand());
+            }
+
+            return taskRepository.save(task);
+        } else {
+            throw new RuntimeException("Task not found!");
+        }
+    }
+
+    // ✅ Delete task
+    public void deleteTask(String id) {
+        taskRepository.deleteById(id);
+    }
+}

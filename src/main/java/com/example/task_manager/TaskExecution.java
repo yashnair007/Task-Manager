@@ -1,41 +1,27 @@
-package com.example.task_manager;  // ✅ Must match folder structure
+package com.example.task_manager;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class TaskExecution {
-    private Date startTime;
-    private Date endTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private String output;
 
     public TaskExecution() {}
 
-    public TaskExecution(Date startTime, Date endTime, String output) {
+    public TaskExecution(LocalDateTime startTime, LocalDateTime endTime, String output) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.output = output;
     }
 
-    public Date getStartTime() {
-        return startTime;
-    }
+    // ✅ Getters & Setters
+    public LocalDateTime getStartTime() { return startTime; }
+    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
+    public LocalDateTime getEndTime() { return endTime; }
+    public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
 
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
-
-    public String getOutput() {
-        return output;
-    }
-
-    public void setOutput(String output) {
-        this.output = output;
-    }
+    public String getOutput() { return output; }
+    public void setOutput(String output) { this.output = output; }
 }

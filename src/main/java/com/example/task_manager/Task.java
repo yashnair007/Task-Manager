@@ -2,29 +2,33 @@ package com.example.task_manager;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "tasks") // This tells MongoDB to store it as a document
+@Document(collection = "tasks") // ✅ MongoDB document annotation
 public class Task {
     @Id
     private String id;
     private String name;
     private String owner;
     private String command;
-    private List<TaskExecution> taskExecutions;
+    private List<TaskExecution> taskExecutions = new ArrayList<>();
 
-    // Constructors
     public Task() {}
 
-    public Task(String id, String name, String owner, String command, List<TaskExecution> taskExecutions) {
-        this.id = id;
+    public Task(String name, String owner, String command) {
         this.name = name;
         this.owner = owner;
         this.command = command;
-        this.taskExecutions = taskExecutions;
+        this.taskExecutions = new ArrayList<>();
     }
 
-    // Getters and Setters
+    // ✅ Add execution results
+    public void addExecution(TaskExecution execution) {
+        this.taskExecutions.add(execution);
+    }
+
+    // ✅ Getters & Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
