@@ -45,6 +45,12 @@ TASK 4 - CI/CD Pipeline
 
 The Pipeline is built using GIT Action
 
+The Dockerfile helps in creating the docker image
+
+also use the maven-docker.yml file to set the configurations
+
+Set the DOCKER HUB username and Authentication tokens as secret variable tokens 
+
 The Docker image of the App has been put as an Image in Docker
 
 The yashput/taskchecker Repo in DOCKER HUB will give the Public Repo for the application
