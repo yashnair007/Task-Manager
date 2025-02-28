@@ -1,5 +1,7 @@
 #Task Manager Application
 
+TASK 1 
+
 The project aims to build a task manager application using Apache maven and Java with MongoDB 
 
 The task manager can perform the following tasks
